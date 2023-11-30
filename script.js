@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     updateNavbarBasedOnLoginStatus();
     // updateCategories();
 });
-const imageBaseUrl ='https://merbmd-001-site1.itempurl.com/images/';
+const imageBaseUrl ='https://merbmd-001-site1.itempurl.com/';
 var products;
 
 var Categories;
