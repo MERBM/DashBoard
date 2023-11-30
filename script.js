@@ -1,8 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     setupEventListeners();
-    updateCartCount();
     updateNavbarBasedOnLoginStatus();
-    // updateCategories();
+    updateCategories();
 });
 const imageBaseUrl ='https://merbmd-001-site1.itempurl.com/';
 var products;
@@ -50,7 +49,7 @@ function setupEventListeners() {
     if (productsLink) productsLink.addEventListener('click', (event) => {
         // Prevent the default link behavior to prevent the page from reloading when the link is clicked
         event.preventDefault();
-        loadProductContent();
+        //loadProductContent();
     });
 }
 
@@ -78,7 +77,6 @@ function loadProductContent() {
                                 <h5 class="card-title">${product.name}</h5>
                                 <p class="card-text">${product.description}</p>
                                 <p class="card-text"><strong>Price:</strong> $${product.price}</p>
-                                <a class="btn btn-primary" onclick="addToCart(${product.id})">Add to Cart</a>
                             </div>
                         </div>
                     </div>
@@ -93,20 +91,7 @@ function loadProductContent() {
 }
 
 
-function loadContent(page) {
-    fetch(page)
-        .then(response => response.text())
-        .then(html => {
-            document.getElementById('productsContainer').innerHTML = html;
-            if(page === './login.html') {
-                setupLoginForm();
-            }
-        })
-        .catch(error => {
-            console.error('Error loading page:', error);
-            document.getElementById('productsContainer').innerHTML = '<p>Error loading content.</p>';
-        });
-}
+
 function loadLoginContent() {
    
     document.getElementById('productsContainer').innerHTML = `
@@ -211,15 +196,12 @@ function updateNavbarBasedOnLoginStatus() {
         document.getElementById('signupButton').style.display = 'block';
         document.getElementById('logoutButton').style.display = 'none';
         document.getElementById('usernameDisplay').style.display = 'none';
-        // document.getElementById('cartCount').style.display = 'none';
-        document.getElementById('cartIcon').style.display = 'none';
+ 
     }
 }
 
 function logout() {
     deleteCookie("currentUser");
-    deleteCookie('cart');
-    updateCartCount();
     updateNavbarBasedOnLoginStatus();
 }
 
@@ -227,101 +209,7 @@ function deleteCookie(name) {
     setCookie(name, '', -1);
 }
 
-function addToCart(productId) {
-    let product = products.find(p => p.id === productId);
-    if (!product) return;
 
-    let cart = getCart();
-    cart.push(product);
-    setCookie('cart', JSON.stringify(cart), 7);
-    updateCartCount();
-}
-
-function getCart() {
-    let cartCookie = getCookie('cart');
-    return cartCookie ? JSON.parse(cartCookie) : [];
-}
-
-function updateCartCount() {
-    let cart = getCart();
-    let count = cart.length;
-    document.getElementById('cartCount').textContent = count;
-}
-
-function showCartDetails() {
-    let cart = getCart();
-    let cartItemsContainer = document.getElementById('cartItems');
-    cartItemsContainer.innerHTML = ''; // Clear existing items
-
-    if (cart.length === 0) {
-        cartItemsContainer.innerHTML = '<p>Your cart is empty.</p>';
-    } else {
-        cart.forEach(item => {
-            cartItemsContainer.innerHTML += `
-                <div class="card mb-2">
-                    <div class="card-body">
-                        <h5 class="card-title">${item.name}</h5>
-                        <p class="card-text">${item.description}</p>
-                        <p class="card-text">Price: $${item.price}</p>
-                        <!-- You can add more details like quantity, remove button, etc. -->
-                    </div>
-                </div>
-            `;
-        });
-    }
-
-    $('#cartModal').modal('show'); // Use Bootstrap's modal method to show the modal
-}
-
-
-function checkout() {
-    let cart = getCart();
-    if (cart.length === 0) {
-        alert("Your cart is empty.");
-        return;
-    }
-
-    let userName = document.getElementById('userName').value;
-    let userEmail = document.getElementById('userEmail').value;
-    let userAddress = document.getElementById('userAddress').value;
-    let userPhone = document.getElementById('userPhone').value;
-
-    if (!userName || !userEmail || !userAddress || !userPhone) {
-        alert("Please fill in all your details.");
-        return;
-    }
-
-    let orderDetails = {
-        user: {
-            name: userName,
-            email: userEmail,
-            address: userAddress,
-            phone: userPhone
-        },
-        items: cart
-    };
-
-    // Set the "ordered" cookie with the order details
-    setCookie('ordered', JSON.stringify(orderDetails), 7); // Storing the order for 7 days
-
-    // Clear the cart
-    setCookie('cart', '', -1); // Clearing the cart cookie
-
-    // Update UI
-    updateCartCount();
-    $('#cartModal').modal('hide'); // Hide the cart modal
-
-    alert("Checkout successful! Your order has been placed.");
-}
-
-
-function getOrderedDetails() {
-    let orderedCookie = getCookie('ordered');
-    if (orderedCookie) {
-        return JSON.parse(orderedCookie);
-    }
-    return null;
-}
 
 function showDashboard() {
     // ... existing showDashboard functionality ...
@@ -342,7 +230,6 @@ function displayProducts(productsList) {
                     <h5 class="card-title">${product.name}</h5>
                     <p class="card-text">${product.description}</p>
                     <p class="card-text"><strong>Price:</strong> $${product.price}</p>
-                    <a  class="btn btn-primary" onclick="addToCart(${product.id})">Add to Cart</a>
                 </div>
             </div>
         </div>
