@@ -3,7 +3,8 @@ document.addEventListener('DOMContentLoaded', () => {
     updateNavbarBasedOnLoginStatus();
     updateCategories();
 });
-const imageBaseUrl ='https://merbmd-001-site1.itempurl.com/';
+const BaseUrl ='https://merbmd-001-site1.itempurl.com/';
+
 var products;
 
 var Categories;
@@ -19,6 +20,8 @@ function updateCategories() {
     })
     .then(Categories => {
         const categoryList = document.getElementById('categoryList');
+        const categorySelect = document.getElementById('productCategory');
+        categorySelect.innerHTML = ''; // Clear existing options
         categoryList.innerHTML = ''; // Clear existing list
 
         Categories.forEach(category => {
@@ -31,7 +34,16 @@ function updateCategories() {
             link.onclick = function() { filterProductsByCategory(category.categoryID); }; // Use 'categoryID' for filtering
 
             listItem.appendChild(link);
-            categoryList.appendChild(listItem);});
+            categoryList.appendChild(listItem);
+        
+           
+            const option = document.createElement('option');
+            option.value = category.categoryID; // Assuming each category has an 'id'
+            option.textContent = category.name; // Assuming each category has a 'name'
+            categorySelect.appendChild(option);
+        
+        });
+            
     })
     .catch(error => {
         console.error('There was a problem with the fetch operation:', error);
@@ -71,7 +83,7 @@ function loadProductContent() {
             } else {
                 const productHtml = products.map(product => `
                     <div class="col-md-4 mb-3">
-                        <img src="${imageBaseUrl}${product.imageURL}" class="card-img-top img-fluid" alt="${product.name}">
+                        <img src="${BaseUrl}${product.imageURL}" class="card-img-top img-fluid" alt="${product.name}">
                         <div class="card">
                             <div class="card-body">
                                 <h5 class="card-title">${product.name}</h5>
@@ -224,17 +236,55 @@ function displayProducts(productsList) {
     productsContainer.innerHTML =  `  `+ productsList.map(product => `
         <div class="col-md-4 mb-3">
             <div class="card">
-            <img src="${imageBaseUrl}${product.imageURL}" class="card-img-top img-fluid" alt="${product.name}">
+            <img src="${BaseUrl}${product.imageURL}" class="card-img-top img-fluid" alt="${product.name}">
 
                 <div class="card-body">
                     <h5 class="card-title">${product.name}</h5>
                     <p class="card-text">${product.description}</p>
                     <p class="card-text"><strong>Price:</strong> $${product.price}</p>
+
                 </div>
             </div>
         </div>
     `).join('');
 }
+function openProductModal(product = null) {
+    // Clear existing data in the modal
+    document.getElementById('productForm').reset();
+    document.getElementById('productModal').removeAttribute('data-product-id');
+
+    if (product) {
+        // If editing a product, populate the form with product data
+        document.getElementById('productName').value = product.name;
+        document.getElementById('productDescription').value = product.description;
+        document.getElementById('productPrice').value = product.price;
+        document.getElementById('productModal').setAttribute('data-product-id', product.id);
+        // Handle the product image if necessary
+    }
+
+    $('#productModal').modal('show');
+}
+
+
+function saveProduct() {
+    const productForm = document.getElementById('productForm');
+    let formData = new FormData(productForm);
+    debugger;
+        // Make an API call to add the product
+        // Replace 'yourAddProductAPI' with the actual endpoint
+        fetch(BaseUrl+'api/Products/Create', {
+            method: 'POST',
+            body: formData
+        })
+        // .then(response => /* Handle the response */)
+        // .catch(error => /* Handle the error */);
+
+    $('#productModal').modal('hide');
+}
+
+// Modify openProductModal as needed to handle editing an existing product (you might need a different approach for editing images)
+
+
 
 function filterProducts(event) {
     event.preventDefault(); // Prevent the form from submitting traditionally
