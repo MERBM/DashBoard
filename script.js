@@ -2,9 +2,9 @@ document.addEventListener('DOMContentLoaded', () => {
     setupEventListeners();
     updateCartCount();
     updateNavbarBasedOnLoginStatus();
-    updateCategories();
+    // updateCategories();
 });
-
+const imageBaseUrl ='https://merbmd-001-site1.itempurl.com/images/';
 var products;
 
 var Categories;
@@ -56,7 +56,6 @@ function setupEventListeners() {
 
 function loadProductContent() {
     const productsContainer = document.getElementById('productsContainer');
-    //take all width 100%
     productsContainer.innerHTML = ` `;
 
     fetch('https://merbmd-001-site1.itempurl.com/api/Products'/*, { mode: 'no-cors' }*/)
@@ -73,7 +72,7 @@ function loadProductContent() {
             } else {
                 const productHtml = products.map(product => `
                     <div class="col-md-4 mb-3">
-                        <img src="./${product.imageURL}" class="card-img-top img-fluid" alt="${product.name}">
+                        <img src="${imageBaseUrl}${product.imageURL}" class="card-img-top img-fluid" alt="${product.name}">
                         <div class="card">
                             <div class="card-body">
                                 <h5 class="card-title">${product.name}</h5>
@@ -337,7 +336,7 @@ function displayProducts(productsList) {
     productsContainer.innerHTML =  `  `+ productsList.map(product => `
         <div class="col-md-4 mb-3">
             <div class="card">
-            <img src="${product.imageURL}" class="card-img-top img-fluid" alt="${product.name}">
+            <img src="${imageBaseUrl}${product.imageURL}" class="card-img-top img-fluid" alt="${product.name}">
 
                 <div class="card-body">
                     <h5 class="card-title">${product.name}</h5>
