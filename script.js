@@ -10,7 +10,7 @@ var products;
 var Categories;
 
 function updateCategories() {
-    fetch('https://merbmd-001-site1.itempurl.com/api/Categories')
+    fetch(BaseUrl+'api/Categories')
     .then(async response => {
         if (!response.ok) {
             throw new Error('Network response was not ok: ' + response.statusText);
@@ -69,7 +69,7 @@ function loadProductContent() {
     const productsContainer = document.getElementById('productsContainer');
     productsContainer.innerHTML = ` `;
 
-    fetch('https://merbmd-001-site1.itempurl.com/api/Products'/*, { mode: 'no-cors' }*/)
+    fetch(BaseUrl+'api/Products'/*, { mode: 'no-cors' }*/)
         .then(async response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok: ' + response.statusText);
@@ -266,21 +266,42 @@ function openProductModal(product = null) {
 }
 
 
-function saveProduct() {
-    const productForm = document.getElementById('productForm');
-    let formData = new FormData(productForm);
-    debugger;
-        // Make an API call to add the product
-        // Replace 'yourAddProductAPI' with the actual endpoint
-        fetch(BaseUrl+'api/Products/Create', {
-            method: 'POST',
-            body: formData
-        })
-        // .then(response => /* Handle the response */)
-        // .catch(error => /* Handle the error */);
+async function saveProduct(event) {
+    event.preventDefault();
 
-    $('#productModal').modal('hide');
+    const productForm = document.getElementById('productForm');
+    if (!productForm) {
+        console.log('Form not found!');
+        return;
+    }
+    const formData = new FormData(productForm);
+    // Log FormData contents to the console
+    for (let [key, value] of formData.entries()) {
+        console.log(`${key}:`, value);
+    }
+    try {
+        const response = await fetch(`${BaseUrl}api/Products`, {
+            method: 'POST', 
+            body: formData
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const responseContent = await response.json();
+        console.log(responseContent);
+        $('#productModal').modal('hide');
+
+
+        // Assuming you want to hide the modal after a successful operation
+        $('#productModal').modal('hide');
+    } catch (error) {
+        console.error('Error during saveProduct:', error);
+    }
 }
+
+// Make sure to replace 'BaseUrl' with the actual base URL of your API.
 
 // Modify openProductModal as needed to handle editing an existing product (you might need a different approach for editing images)
 
